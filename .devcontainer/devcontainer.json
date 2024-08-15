@@ -1,0 +1,15 @@
+{
+    "name": "verus-study-codespace",
+    //"image": "mcr.microsoft.com/vscode/devcontainers/rust:latest",
+    "build": {"dockerfile": "verus-study.dockerfile"},
+    "customizations": {"vscode": { "settings": {
+      "terminal.integrated.shell.linux": "/bin/bash",
+      "rust-analyzer.server.path": "verus-analyzer-x86_64-unknown-linux-gnu",
+      "rust-analyzer.checkOnSave": false
+    },
+    "extensions": [
+      //"rust-lang.rust-analyzer"
+    ]}},
+   
+    "postStartCommand": "bash -i .devcontainer/setup.sh"
+  }
