@@ -9,7 +9,8 @@ fn main() {
     assert_eq!(smallest_num(&vec![45, 46, 50, 60]),45);
 
 }
-
+Seattle Chamber Music Society
+dir. James Ehnes
 verus! {
 fn smallest_num(nums: &Vec<i32>) -> (min: i32)
     requires
