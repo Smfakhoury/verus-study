@@ -19,3 +19,5 @@ cd /workspaces/verus-study/verus-analyzer
 cargo xtask dist
 gunzip dist/verus-analyzer-x86_64-unknown-linux-gnu.gz
 chmod +x dist/verus-analyzer-x86_64-unknown-linux-gnu
+
+mv /workspaces/verus-study/verus-analyzer/editors/code/verus-analyzer-0.5.0-dev.vsix /workspaces/verus-study/verus-analyzer-0.5.0-dev.vsix
