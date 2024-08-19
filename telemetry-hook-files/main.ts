@@ -33,7 +33,7 @@ export async function activate(
     // so we do it ourselves.
     const api = await activateServer(ctx).catch((err) => {
         void vscode.window.showErrorMessage(
-            `Cannot activate rust-analyzer extension: ${err.message}`,
+            `Cannot activate verus-analyzer extension: ${err.message}`,
         );
         throw err;
     });
@@ -71,16 +71,6 @@ async function activateServer(ctx: Ctx): Promise<RustAnalyzerExtensionApi> {
         ctx.subscriptions,
     );
     vscode.workspace.onDidOpenTextDocument(decorateVisibleEditors, null, ctx.subscriptions);
-    vscode.workspace.onDidSaveTextDocument(e => {
-        telemetry.sendRawTelemetryEvent('verusSave', {fileName: getFilename(e.uri.toString()),
-            contents: e.getText(), 
-        });
-    });
-    vscode.workspace.onDidCloseTextDocument(e => {
-        telemetry.sendRawTelemetryEvent('verusClose', {fileName: getFilename(e.uri.toString()),
-            contents: e.getText(), 
-        });
-    });
     vscode.window.onDidChangeActiveTextEditor(
         async (editor) => {
             if (editor) {
@@ -91,6 +81,16 @@ async function activateServer(ctx: Ctx): Promise<RustAnalyzerExtensionApi> {
         null,
         ctx.subscriptions,
     );
+    vscode.workspace.onDidSaveTextDocument(e => {
+        telemetry.sendRawTelemetryEvent('verusSave', {fileName: getFilename(e.uri.toString()),
+            contents: e.getText(), 
+        });
+    });
+    vscode.workspace.onDidCloseTextDocument(e => {
+        telemetry.sendRawTelemetryEvent('verusClose', {fileName: getFilename(e.uri.toString()),
+            contents: e.getText(), 
+        });
+    });
     vscode.window.onDidChangeVisibleTextEditors(
         async (visibleEditors) => {
             for (const editor of visibleEditors) {
@@ -208,7 +208,7 @@ function checkConflictingExtensions() {
     if (vscode.extensions.getExtension("rust-lang.rust")) {
         vscode.window
             .showWarningMessage(
-                `You have both the rust-analyzer (rust-lang.rust-analyzer) and Rust (rust-lang.rust) ` +
+                `You have both the verus-analyzer (verus-lang.verus-analyzer) and Rust (rust-lang.rust) ` +
                     "plugins enabled. These are known to conflict and cause various functions of " +
                     "both plugins to not work correctly. You should disable one of them.",
                 "Got it",

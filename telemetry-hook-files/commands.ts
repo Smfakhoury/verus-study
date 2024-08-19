@@ -73,7 +73,7 @@ export class RateLimiter implements SignalProc {
 	}
 }
 
-export const telemetry = new TelemetryReporter('160d3440-45e8-47c1-9cf1-ccd46149ff89');
+export const telemetry = new TelemetryReporter("InstrumentationKey=160d3440-45e8-47c1-9cf1-ccd46149ff89;IngestionEndpoint=https://eastus-8.in.applicationinsights.azure.com/;LiveEndpoint=https://eastus.livediagnostics.monitor.azure.com/;ApplicationId=a4e6ffa7-4f8c-47c3-8d7f-0f4dbcf57019-45e8-47c1-9cf1-ccd46149ff89");
 export const getFilename = (uri: string): string => {
     const match = uri.match(/[^\\/]+$/)?.toString();
     return match ? match : '';
@@ -83,10 +83,9 @@ const changeRateLimiter = new RateLimiter(2000, () => {
     telemetry.sendRawTelemetryEvent("verusChangeContent", changeProperties);
 });
 
-
 export function analyzerStatus(ctx: CtxInit): Cmd {
     const tdcp = new (class implements vscode.TextDocumentContentProvider {
-        readonly uri = vscode.Uri.parse("rust-analyzer-status://status");
+        readonly uri = vscode.Uri.parse("verus-analyzer-status://status");
         readonly eventEmitter = new vscode.EventEmitter<vscode.Uri>();
 
         async provideTextDocumentContent(_uri: vscode.Uri): Promise<string> {
@@ -107,7 +106,7 @@ export function analyzerStatus(ctx: CtxInit): Cmd {
     })();
 
     ctx.pushExtCleanup(
-        vscode.workspace.registerTextDocumentContentProvider("rust-analyzer-status", tdcp),
+        vscode.workspace.registerTextDocumentContentProvider("verus-analyzer-status", tdcp),
     );
 
     return async () => {
@@ -122,7 +121,7 @@ export function analyzerStatus(ctx: CtxInit): Cmd {
 
 export function memoryUsage(ctx: CtxInit): Cmd {
     const tdcp = new (class implements vscode.TextDocumentContentProvider {
-        readonly uri = vscode.Uri.parse("rust-analyzer-memory://memory");
+        readonly uri = vscode.Uri.parse("verus-analyzer-memory://memory");
         readonly eventEmitter = new vscode.EventEmitter<vscode.Uri>();
 
         provideTextDocumentContent(_uri: vscode.Uri): vscode.ProviderResult<string> {
@@ -139,7 +138,7 @@ export function memoryUsage(ctx: CtxInit): Cmd {
     })();
 
     ctx.pushExtCleanup(
-        vscode.workspace.registerTextDocumentContentProvider("rust-analyzer-memory", tdcp),
+        vscode.workspace.registerTextDocumentContentProvider("verus-analyzer-memory", tdcp),
     );
 
     return async () => {
@@ -403,7 +402,7 @@ async function revealParentChain(document: RustDocument, ctx: CtxInit) {
 }
 
 export async function execRevealDependency(e: RustEditor): Promise<void> {
-    await vscode.commands.executeCommand("rust-analyzer.revealDependency", e);
+    await vscode.commands.executeCommand("verus-analyzer.revealDependency", e);
 }
 
 export function ssr(ctx: CtxInit): Cmd {
@@ -466,11 +465,11 @@ export function ssr(ctx: CtxInit): Cmd {
 export function serverVersion(ctx: CtxInit): Cmd {
     return async () => {
         if (!ctx.serverPath) {
-            void vscode.window.showWarningMessage(`rust-analyzer server is not running`);
+            void vscode.window.showWarningMessage(`verus-analyzer server is not running`);
             return;
         }
         void vscode.window.showInformationMessage(
-            `rust-analyzer version: ${ctx.serverVersion} [${ctx.serverPath}]`,
+            `verus-analyzer version: ${ctx.serverVersion} [${ctx.serverPath}]`,
         );
     };
 }
@@ -480,7 +479,7 @@ export function serverVersion(ctx: CtxInit): Cmd {
 // The contents of the file come from the `TextDocumentContentProvider`
 export function syntaxTree(ctx: CtxInit): Cmd {
     const tdcp = new (class implements vscode.TextDocumentContentProvider {
-        readonly uri = vscode.Uri.parse("rust-analyzer-syntax-tree://syntaxtree/tree.rast");
+        readonly uri = vscode.Uri.parse("verus-analyzer-syntax-tree://syntaxtree/tree.rast");
         readonly eventEmitter = new vscode.EventEmitter<vscode.Uri>();
         constructor() {
             vscode.workspace.onDidChangeTextDocument(
@@ -533,7 +532,7 @@ export function syntaxTree(ctx: CtxInit): Cmd {
 
     ctx.pushExtCleanup(new AstInspector(ctx));
     ctx.pushExtCleanup(
-        vscode.workspace.registerTextDocumentContentProvider("rust-analyzer-syntax-tree", tdcp),
+        vscode.workspace.registerTextDocumentContentProvider("verus-analyzer-syntax-tree", tdcp),
     );
     ctx.pushExtCleanup(
         vscode.languages.setLanguageConfiguration("ra_syntax_tree", {
@@ -561,8 +560,8 @@ export function syntaxTree(ctx: CtxInit): Cmd {
 function viewHirOrMir(ctx: CtxInit, xir: "hir" | "mir"): Cmd {
     const viewXir = xir === "hir" ? "viewHir" : "viewMir";
     const requestType = xir === "hir" ? ra.viewHir : ra.viewMir;
-    const uri = `rust-analyzer-${xir}://${viewXir}/${xir}.rs`;
-    const scheme = `rust-analyzer-${xir}`;
+    const uri = `verus-analyzer-${xir}://${viewXir}/${xir}.rs`;
+    const scheme = `verus-analyzer-${xir}`;
     return viewFileUsingTextDocumentContentProvider(ctx, requestType, uri, scheme, true);
 }
 
@@ -640,11 +639,10 @@ function viewFileUsingTextDocumentContentProvider(
     ctx.pushExtCleanup(vscode.workspace.registerTextDocumentContentProvider(scheme, tdcp));
 
     return async () => {
-        // open file hook
         const document = await vscode.workspace.openTextDocument(tdcp.uri);
+        tdcp.eventEmitter.fire(tdcp.uri);
         telemetry.sendRawTelemetryEvent('verusOpen', {fileName: getFilename(document.uri.toString()), contents: document.getText(),
         });
-        tdcp.eventEmitter.fire(tdcp.uri);
         void (await vscode.window.showTextDocument(document, {
             viewColumn: vscode.ViewColumn.Two,
             preserveFocus: true,
@@ -670,19 +668,19 @@ export function viewMir(ctx: CtxInit): Cmd {
 //
 // The contents of the file come from the `TextDocumentContentProvider`
 export function interpretFunction(ctx: CtxInit): Cmd {
-    const uri = `rust-analyzer-interpret-function://interpretFunction/result.log`;
+    const uri = `verus-analyzer-interpret-function://interpretFunction/result.log`;
     return viewFileUsingTextDocumentContentProvider(
         ctx,
         ra.interpretFunction,
         uri,
-        `rust-analyzer-interpret-function`,
+        `verus-analyzer-interpret-function`,
         false,
     );
 }
 
 export function viewFileText(ctx: CtxInit): Cmd {
     const tdcp = new (class implements vscode.TextDocumentContentProvider {
-        readonly uri = vscode.Uri.parse("rust-analyzer-file-text://viewFileText/file.rs");
+        readonly uri = vscode.Uri.parse("verus-analyzer-file-text://viewFileText/file.rs");
         readonly eventEmitter = new vscode.EventEmitter<vscode.Uri>();
         constructor() {
             vscode.workspace.onDidChangeTextDocument(
@@ -701,19 +699,7 @@ export function viewFileText(ctx: CtxInit): Cmd {
             if (isRustDocument(event.document)) {
                 // We need to order this after language server updates, but there's no API for that.
                 // Hence, good old sleep().
-                void sleep(10).then(() => {
-                    const starts = event.contentChanges.map(
-                        ch => `${ch.range.start.line}:${ch.range.start.character}`).join('\n');
-                    const ends = event.contentChanges.map(
-                        ch => `${ch.range.end.line}:${ch.range.end.character}`).join('\n');
-                    const changes = event.contentChanges.map(
-                        ch => `${ch.text}`).join('\n');
-                    changeProperties = {fileName: getFilename(event.document.fileName), 
-                        contents: event.document.getText(), starts: starts, ends: ends, changes: changes,
-                    };
-                    //telemetry.sendRawTelemetryEvent("verusChangeContent", changeProperties);
-                    changeRateLimiter.fire();
-                    this.eventEmitter.fire(this.uri);});
+                void sleep(10).then(() => this.eventEmitter.fire(this.uri));
             }
         }
         private onDidChangeActiveTextEditor(editor: vscode.TextEditor | undefined) {
@@ -742,13 +728,11 @@ export function viewFileText(ctx: CtxInit): Cmd {
     })();
 
     ctx.pushExtCleanup(
-        vscode.workspace.registerTextDocumentContentProvider("rust-analyzer-file-text", tdcp),
+        vscode.workspace.registerTextDocumentContentProvider("verus-analyzer-file-text", tdcp),
     );
 
     return async () => {
         const document = await vscode.workspace.openTextDocument(tdcp.uri);
-        telemetry.sendRawTelemetryEvent('verusOpen', {fileName: getFilename(document.uri.toString()), contents: document.getText(),
-        });
         tdcp.eventEmitter.fire(tdcp.uri);
         void (await vscode.window.showTextDocument(document, {
             viewColumn: vscode.ViewColumn.Two,
@@ -759,7 +743,7 @@ export function viewFileText(ctx: CtxInit): Cmd {
 
 export function viewItemTree(ctx: CtxInit): Cmd {
     const tdcp = new (class implements vscode.TextDocumentContentProvider {
-        readonly uri = vscode.Uri.parse("rust-analyzer-item-tree://viewItemTree/itemtree.rs");
+        readonly uri = vscode.Uri.parse("verus-analyzer-item-tree://viewItemTree/itemtree.rs");
         readonly eventEmitter = new vscode.EventEmitter<vscode.Uri>();
         constructor() {
             vscode.workspace.onDidChangeTextDocument(
@@ -809,7 +793,7 @@ export function viewItemTree(ctx: CtxInit): Cmd {
     })();
 
     ctx.pushExtCleanup(
-        vscode.workspace.registerTextDocumentContentProvider("rust-analyzer-item-tree", tdcp),
+        vscode.workspace.registerTextDocumentContentProvider("verus-analyzer-item-tree", tdcp),
     );
 
     return async () => {
@@ -827,8 +811,8 @@ function crateGraph(ctx: CtxInit, full: boolean): Cmd {
         const nodeModulesPath = vscode.Uri.file(path.join(ctx.extensionPath, "node_modules"));
 
         const panel = vscode.window.createWebviewPanel(
-            "rust-analyzer.crate-graph",
-            "rust-analyzer crate graph",
+            "verus-analyzer.crate-graph",
+            "verus-analyzer crate graph",
             vscode.ViewColumn.Two,
             {
                 enableScripts: true,
@@ -912,7 +896,7 @@ export function expandMacro(ctx: CtxInit): Cmd {
     }
 
     const tdcp = new (class implements vscode.TextDocumentContentProvider {
-        uri = vscode.Uri.parse("rust-analyzer-expand-macro://expandMacro/[EXPANSION].rs");
+        uri = vscode.Uri.parse("verus-analyzer-expand-macro://expandMacro/[EXPANSION].rs");
         eventEmitter = new vscode.EventEmitter<vscode.Uri>();
         async provideTextDocumentContent(_uri: vscode.Uri): Promise<string> {
             const editor = vscode.window.activeTextEditor;
@@ -939,7 +923,7 @@ export function expandMacro(ctx: CtxInit): Cmd {
     })();
 
     ctx.pushExtCleanup(
-        vscode.workspace.registerTextDocumentContentProvider("rust-analyzer-expand-macro", tdcp),
+        vscode.workspace.registerTextDocumentContentProvider("verus-analyzer-expand-macro", tdcp),
     );
 
     return async () => {
@@ -984,7 +968,7 @@ export function applyActionGroup(_ctx: CtxInit): Cmd {
         const selectedAction = await vscode.window.showQuickPick(actions);
         if (!selectedAction) return;
         await vscode.commands.executeCommand(
-            "rust-analyzer.resolveCodeAction",
+            "verus-analyzer.resolveCodeAction",
             selectedAction.arguments,
         );
     };
@@ -996,9 +980,8 @@ export function gotoLocation(ctx: CtxInit): Cmd {
         const uri = client.protocol2CodeConverter.asUri(locationLink.targetUri);
         let range = client.protocol2CodeConverter.asRange(locationLink.targetSelectionRange);
         // collapse the range to a cursor position
-        range = range.with({ end: range.start }); 
+        range = range.with({ end: range.start });
 
-        //telemetry.sendTelemetryEvent('verusGotoLocation', {uri: locationLink.targetUri});
         await vscode.window.showTextDocument(uri, { selection: range });
     };
 }
@@ -1014,8 +997,6 @@ export function openDocs(ctx: CtxInit): Cmd {
         const position = editor.selection.active;
         const textDocument = { uri: editor.document.uri.toString() };
 
-        //telemetry.sendRawTelemetryEvent('verusOpenDocs', {doc: editor.document.getText()});
-        //tclient.trackEvent({ name: "verusOpenDocs", properties: {something: "fakefilename"}});
         const docLinks = await client.sendRequest(ra.openDocs, { position, textDocument });
         log.debug(docLinks);
 
@@ -1051,7 +1032,6 @@ export function openExternalDocs(ctx: CtxInit): Cmd {
         const position = editor.selection.active;
         const textDocument = { uri: editor.document.uri.toString() };
 
-        //tclient.trackEvent({ name: "verusOpenExternalDocs", properties: textDocument });
         const docLinks = await client.sendRequest(ra.openDocs, { position, textDocument });
 
         let docLink = docLinks.web;
@@ -1068,9 +1048,6 @@ export function openExternalDocs(ctx: CtxInit): Cmd {
 
 export function cancelFlycheck(ctx: CtxInit): Cmd {
     return async () => {
-        const doc = ctx.activeRustEditor!.document;
-        telemetry.sendRawTelemetryEvent('verusCancelFlycheck', {fileName: getFilename(doc.uri.toString()), contents: doc.getText(),
-        });
         await ctx.client.sendNotification(ra.cancelFlycheck);
     };
 }
@@ -1581,7 +1558,7 @@ export function toggleCheckOnSave(ctx: Ctx): Cmd {
 
 export function toggleLSPLogs(ctx: Ctx): Cmd {
     return async () => {
-        const config = vscode.workspace.getConfiguration("rust-analyzer");
+        const config = vscode.workspace.getConfiguration("verus-analyzer");
         const targetValue =
             config.get<string | undefined>("trace.server") === "verbose" ? undefined : "verbose";
 
