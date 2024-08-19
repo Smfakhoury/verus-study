@@ -44,7 +44,7 @@ RUN cd $HOME \
     && cd verus/source \
     && ./tools/get-z3.sh \
     && source ../tools/activate \
-    && vargo build --release
+#    && vargo build --release
 #RUN mkdir study
 #COPY . /study
 #ENV DIR /study
