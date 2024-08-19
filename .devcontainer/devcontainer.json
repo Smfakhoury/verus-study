@@ -5,7 +5,7 @@
   "customizations": {"vscode": { "settings": {
     "terminal.integrated.shell.linux": "/bin/bash",
     "verus-analyzer.server.path": "/workspaces/verus-study/bin/verus-analyzer-x86_64-unknown-linux-gnu",
-    "verus-analyzer.checkOnSave": false
+    //"verus-analyzer.checkOnSave.overrideCommand": ["/home/vscode/verus/source/target-verus/release/verus"]
   },
   "extensions": [
     //"rust-lang.rust-analyzer"

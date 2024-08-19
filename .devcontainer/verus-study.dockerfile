@@ -39,12 +39,12 @@ RUN export NVM_DIR="$HOME/.nvm" \
 RUN echo 'export PATH=$HOME/bin:$PATH' | tee --append $HOME/.profile $HOME/.bashrc $HOME/.bash_profile
 
 # get and build verus
-#RUN cd $HOME \
-#    && git clone https://github.com/verus-lang/verus.git \
-#    && cd verus/source 
-    #&& ./tools/get-z3.sh \
-    #&& source ../tools/activate \
-    #&& vargo build --release
+RUN cd $HOME \
+    && git clone https://github.com/verus-lang/verus.git \
+    && cd verus/source \
+    && ./tools/get-z3.sh \
+    && source ../tools/activate \
+    && vargo build --release
 #RUN mkdir study
 #COPY . /study
 #ENV DIR /study
