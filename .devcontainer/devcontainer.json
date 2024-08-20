@@ -1,10 +1,11 @@
 {
   "name": "verus-study-codespace",
-  //"image": "mcr.microsoft.com/vscode/devcontainers/rust:latest",
-  "build": {"dockerfile": "verus-study.dockerfile"},
+  "image": "trijuljainms/verus-study:base",
+  //"build": {"dockerfile": "verus-study.dockerfile"},
   "customizations": {"vscode": { "settings": {
     "terminal.integrated.shell.linux": "/bin/bash",
-    "verus-analyzer.server.path": "/workspaces/verus-study/bin/verus-analyzer-x86_64-unknown-linux-gnu",
+    "verus-analyzer.server.path": "/home/vscode/verus-analyzer/dist/verus-analyzer-x86_64-unknown-linux-gnu",
+    "verus-analyzer.checkOnSave": false,
     //"verus-analyzer.checkOnSave.overrideCommand": ["/home/vscode/verus/source/target-verus/release/verus"]
   },
   "extensions": [
