@@ -5,12 +5,15 @@
   "customizations": {"vscode": { "settings": {
     "terminal.integrated.shell.linux": "/bin/bash",
     "verus-analyzer.server.path": "/home/vscode/verus-analyzer/dist/verus-analyzer-x86_64-unknown-linux-gnu",
-    "verus-analyzer.checkOnSave": false,
-    //"verus-analyzer.checkOnSave.overrideCommand": ["/home/vscode/verus/source/target-verus/release/verus"]
+    //"verus-analyzer.checkOnSave": false,
+    "verus-analyzer.checkOnSave.overrideCommand": ["/home/vscode/verus/source/target-verus/release/verus"],
+    /*"verus-analyzer.server.extraEnv": {
+      "VERUS_BINARY_PATH": "/home/vscode/verus/source/target-verus/release/verus"
+    },*/
   },
   "extensions": [
     //"rust-lang.rust-analyzer"
   ]}},
  
-  //"postCreateCommand": "bash -i .devcontainer/setup.sh"
+  "postCreateCommand": "bash -i .devcontainer/setup.sh"
 }
