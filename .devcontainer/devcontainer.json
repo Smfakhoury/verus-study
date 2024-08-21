@@ -13,5 +13,6 @@
     //"rust-lang.rust-analyzer"
   ]}},
  
+  "postAttachCommand": "code --install-extension ext/verus-analyzer-0.5.0-dev.vsix"
   //"postCreateCommand": "bash -i .devcontainer/setup.sh"
 }
