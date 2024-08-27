@@ -1,6 +1,6 @@
 use vstd::prelude::*;
 
-mod task249;
+mod task588;
 mod task576;
 
 fn main() {
