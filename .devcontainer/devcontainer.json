@@ -13,6 +13,6 @@
     //"rust-lang.rust-analyzer"
   ]}},
  
-  "postAttachCommand": "code --install-extension ext/verus-analyzer-0.5.0-dev.vsix"
+  "postAttachCommand": "code --install-extension ext/verus-analyzer-0.5.0-dev.vsix && export PATH=/home/vscode/verus/source/target-verus/release/verus:$PATH"
   //"postCreateCommand": "bash -i .devcontainer/setup.sh"
 }
