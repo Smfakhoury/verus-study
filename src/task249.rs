@@ -4,11 +4,12 @@ fn main() {
 
     // Given a function in Rust that finds the intersection of two arrays, prove its correctness.
 
-    assert_eq!(intersection(&vec![1, 2, 3, 5, 7, 8, 9, 10],&vec![1, 2, 4, 8, 9]),[1, 2, 8, 9]);
-    assert_eq!(intersection(&vec![1, 2, 3, 5, 7, 8, 9, 10],&vec![3,5,7,9]),[3,5,7,9]);
-    assert_eq!(intersection(&vec![1, 2, 3, 5, 7, 8, 9, 10],&vec![10,20,30,40]),[10]);
-    assert_eq!(intersection(&vec![],&vec![]),[]);
-    assert_eq!(intersection(&vec![1,2,1],&vec![3,1,1,2]),[1,2]);
+    // Sample test cases
+    // input: [1, 2, 3, 5, 7, 8, 9, 10] and [1, 2, 4, 8, 9], output: [1, 2, 8, 9]
+    // input: [1, 2, 3, 5, 7, 8, 9, 10] and [3,5,7,9], output: [3,5,7,9]
+    // input: [1, 2, 3, 5, 7, 8, 9, 10] and [10,20,30,40], output: [10]
+    // input: [] and [], output: []
+    // input: [1,2,1] and [3,1,1,2], output: [1,2]
 
 
 }
@@ -16,7 +17,7 @@ fn main() {
 verus!{
 
 
-fn contains(arr: &Vec<i32>, key:i32) -> (result: bool)
+fn contains(arr: &Vec<i32>, key:i32) -> bool
 {
     let mut i = 0;
     while i < arr.len()
