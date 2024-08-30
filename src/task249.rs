@@ -4,7 +4,7 @@ fn main() {
 
     // Given a function in Rust that finds the intersection of two arrays, prove its correctness.
 
-    // Sample test cases
+    // Sample cases
     // input: [1, 2, 3, 5, 7, 8, 9, 10] and [1, 2, 4, 8, 9], output: [1, 2, 8, 9]
     // input: [1, 2, 3, 5, 7, 8, 9, 10] and [3,5,7,9], output: [3,5,7,9]
     // input: [1, 2, 3, 5, 7, 8, 9, 10] and [10,20,30,40], output: [10]
